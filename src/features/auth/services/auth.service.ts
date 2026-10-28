@@ -1,5 +1,3 @@
-import { API_BASE_URL } from "@/lib/api/base-url";
-
 export type LoginAudience = "student" | "staff";
 export type UserRole = "student" | "teacher" | "admin";
 
@@ -21,14 +19,12 @@ export class AuthRequestError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!API_BASE_URL) {
-    throw new AuthRequestError("Sign-in will be available after the API is connected.", 503);
-  }
+  const authPath = `/api/auth${path.replace(/^\/api\/auth/, "")}`;
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await fetch(authPath, {
       ...init,
-      credentials: "include",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json", ...init?.headers },
     });
   } catch {
@@ -44,7 +40,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function login(identifier: string, password: string, audience: LoginAudience = "student") {
-  return request<AuthResponse>(`/api/auth/login/${audience}`, {
+  return request<AuthResponse>(`/login/${audience}`, {
     method: "POST",
     body: JSON.stringify({ identifier, password }),
   });

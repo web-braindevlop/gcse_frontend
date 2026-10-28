@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "@/components/common";
 import { Button, Input } from "@/components/ui";
-import { login, type LoginAudience } from "../services/auth.service";
+import { AuthRequestError, getCurrentUser, login, type LoginAudience } from "../services/auth.service";
 
 type FieldErrors = { identifier?: string; password?: string };
 
@@ -33,9 +33,12 @@ export function LoginForm({ audience = "student" }: { audience?: LoginAudience }
 
     setIsSubmitting(true);
     try {
-      await login(identifier, password, audience);
+      const { user: signedInUser } = await login(identifier, password, audience);
+      const { user: verifiedUser } = await getCurrentUser();
+      if (verifiedUser.id !== signedInUser.id || verifiedUser.role !== signedInUser.role) {
+        throw new AuthRequestError("Your sign-in could not be verified. Please try again.", 401);
+      }
       router.replace(audience === "staff" ? "/staff/dashboard" : "/dashboard/overview");
-      router.refresh();
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "We could not sign you in. Please try again.");
     } finally {
