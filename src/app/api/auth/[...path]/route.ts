@@ -47,7 +47,8 @@ async function proxyAuthRequest(request: Request, context: RouteContext) {
       responseHeaders.append("set-cookie", setCookie);
     }
 
-    return new Response(await upstream.arrayBuffer(), {
+    const body = [204, 205, 304].includes(upstream.status) ? null : await upstream.arrayBuffer();
+    return new Response(body, {
       status: upstream.status,
       headers: responseHeaders,
     });
