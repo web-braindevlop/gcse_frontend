@@ -39,6 +39,17 @@ The home route lives at `src/app/page.tsx`; its UI is implemented in `src/featur
 npm install
 npm run dev
 ```
+
+## Hostinger deployment
+
+This frontend runs as a Next.js Node.js application and does not connect to MySQL directly. In Hostinger, create a **Node.js Web App** from this GitHub repository, select Node.js 24, and use the existing commands:
+
+- Build: `npm run build`
+- Start: `npm run start`
+
+Hostinger's GitHub deployment builds and starts the app. No FTP workflow or frontend database is required. The app uses the full Next.js Node runtime; do not enable static export.
+
+The frontend can be deployed before the API exists. The public pages continue to work, and sign-in or student-content features display a connection message until the API URL is configured. When the API subdomain is ready, set both `NEXT_PUBLIC_API_BASE_URL` and `AUTH_API_BASE_URL` to its base URL in the Hostinger app settings. `NEXT_PUBLIC_API_BASE_URL` is embedded during the build, so rebuild/redeploy after setting or changing it. Keep database credentials on the backend only.
 ## Motion components
 
 Shared animation primitives live in `src/components/motion` and are exported from `@/components/motion`:

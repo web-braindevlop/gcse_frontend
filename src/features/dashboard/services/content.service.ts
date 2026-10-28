@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/lib/api/base-url";
+
 export type ContentStatus = "draft" | "published";
 export type ContentRecord = {
   id: string;
@@ -13,13 +15,14 @@ export type ContentRecord = {
 };
 export type ContentInput = Pick<ContentRecord, "subject" | "title" | "topic" | "summary" | "body" | "status">;
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000").replace(/\/+$/, "");
-
 export class ContentRequestError extends Error {
   constructor(message: string, public readonly status: number) { super(message); this.name = "ContentRequestError"; }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  if (!API_BASE_URL) {
+    throw new ContentRequestError("Content management will be available after the API is connected.", 503);
+  }
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}/api/content${path}`, {

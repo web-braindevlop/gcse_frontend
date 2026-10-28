@@ -1,4 +1,6 @@
-﻿export type LoginAudience = "student" | "staff";
+import { API_BASE_URL } from "@/lib/api/base-url";
+
+export type LoginAudience = "student" | "staff";
 export type UserRole = "student" | "teacher" | "admin";
 
 export type AuthUser = {
@@ -18,9 +20,10 @@ export class AuthRequestError extends Error {
   }
 }
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000").replace(/\/+$/, "");
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  if (!API_BASE_URL) {
+    throw new AuthRequestError("Sign-in will be available after the API is connected.", 503);
+  }
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {

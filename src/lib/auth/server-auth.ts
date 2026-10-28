@@ -4,7 +4,10 @@ import { cache } from "react";
 import { cookies } from "next/headers";
 
 const SESSION_COOKIE = "educate_cloud_session";
-const API_BASE_URL = (process.env.AUTH_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000").replace(/\/+$/, "");
+
+function getAuthApiBaseUrl() {
+  return (process.env.AUTH_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || (process.env.NODE_ENV === "development" ? "http://localhost:4000" : "")).replace(/\/+$/, "");
+}
 
 export type ServerAuthUser = {
   id: string;
@@ -22,9 +25,11 @@ export type ServerAuthResult =
 export const getVerifiedUser = cache(async (): Promise<ServerAuthResult> => {
   const session = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!session) return { status: "unauthenticated" };
+  const apiBaseUrl = getAuthApiBaseUrl();
+  if (!apiBaseUrl) return { status: "unavailable" };
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+    const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
       method: "GET",
       headers: { Cookie: `${SESSION_COOKIE}=${session}` },
       cache: "no-store",
