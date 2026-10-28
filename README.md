@@ -49,6 +49,8 @@ This frontend runs as a Next.js Node.js application and does not connect to MySQ
 
 Hostinger's GitHub deployment builds and starts the app. No FTP workflow or frontend database is required. The app uses the full Next.js Node runtime; do not enable static export.
 
+The `.github/workflows/production.yml` workflow runs on changes to `main`, pull requests targeting `main`, or a manual run. It installs dependencies and verifies that the production build succeeds; it does not upload or deploy files. Hostinger remains responsible for deployment. If the production API is ready, set the GitHub Actions repository variable `PRODUCTION_API_BASE_URL` so pull request and production builds use the correct API URL.
+
 The frontend can be deployed before the API exists. The public pages continue to work, and sign-in or student-content features display a connection message until the API URL is configured. When the API subdomain is ready, set both `NEXT_PUBLIC_API_BASE_URL` and `AUTH_API_BASE_URL` to its base URL in the Hostinger app settings. `NEXT_PUBLIC_API_BASE_URL` is embedded during the build, so rebuild/redeploy after setting or changing it. Keep database credentials on the backend only.
 ## Motion components
 
