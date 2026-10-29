@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, ChevronUp, LoaderCircle, RefreshCw, Search, Users } from "lucide-react";
+import Link from "next/link";
+import { Check, ChevronDown, ChevronUp, ClipboardList, LoaderCircle, RefreshCw, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useToast } from "@/components/feedback";
 import {
@@ -122,7 +123,10 @@ export function StudentDirectory() {
 
   return (
     <section aria-label="Students" className="mt-9">
-      <div className="flex justify-end"><Button variant="outline" onClick={() => void load(query, page)} loading={loading} aria-label="Refresh student list"><RefreshCw aria-hidden="true" className="size-4" /> Refresh</Button></div>
+      <div className="flex items-center justify-between gap-3">
+        <Link href="/staff/dashboard/profile-setup" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 text-sm font-semibold text-[#182331] transition-colors hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7777a6]"><ClipboardList aria-hidden="true" className="size-4" /> Profile</Link>
+        <Button variant="outline" onClick={() => void load(query, page)} loading={loading} aria-label="Refresh student list"><RefreshCw aria-hidden="true" className="size-4" /> Refresh</Button>
+      </div>
       <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-[#e2e2f1] bg-white p-4 shadow-sm shadow-[#34345d]/[0.035] sm:flex-row sm:items-center sm:justify-between sm:px-5"><div className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-xl bg-[#e6e6f8] text-[#45456e]"><Users aria-hidden="true" className="size-5" /></span><div><p className="text-xs font-medium text-stone-500">Registered students</p><p aria-live="polite" className="mt-0.5 text-xl font-semibold tabular-nums text-[#182331]">{loading ? "—" : total.toLocaleString()}</p></div></div><label className="relative block w-full sm:max-w-sm"><span className="sr-only">Search students</span><Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-stone-400" /><input value={query} onChange={(event) => updateSearch(event.target.value)} placeholder="Search students" className="min-h-11 w-full rounded-xl border border-stone-200 bg-white pl-9 pr-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus-visible:border-[#9292bf] focus-visible:ring-2 focus-visible:ring-[#e6e6f8]" /></label></div>
       <div className="mt-4 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm shadow-stone-900/[0.025]">
         {error && <div role="alert" className="m-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>}
