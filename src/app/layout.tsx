@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion";
 import { ToastProvider } from "@/components/feedback";
+import { AgentationDevTools } from "@/components/dev/agentation-dev-tools";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <body className="min-h-full flex flex-col">
         <MotionProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {children}
+            <AgentationDevTools />
+          </ToastProvider>
         </MotionProvider>
       </body>
     </html>
