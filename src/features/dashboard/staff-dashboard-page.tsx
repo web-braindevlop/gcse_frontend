@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpen, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui";
+import { useToast } from "@/components/feedback";
 import { getCurrentUser, logout, type AuthUser } from "@/features/auth/services/auth.service";
 import { ContentManager } from "./components/content-manager";
 import { StaffSidebar, type StaffSection } from "./components/staff-sidebar";
@@ -11,6 +12,7 @@ import { StudentDirectory } from "./components/student-directory";
 
 export default function StaffDashboardPage() {
   const router = useRouter();
+  const toast = useToast();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [message, setMessage] = useState("Loading your staff account...");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -41,10 +43,10 @@ export default function StaffDashboardPage() {
     setIsLoggingOut(true);
     try {
       await logout();
+      toast.success("Signed out", "You have been securely signed out.");
       router.replace("/login/staff");
-      router.refresh();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "We could not sign you out. Please try again.");
+      toast.error("Sign-out failed", error instanceof Error ? error.message : "We could not sign you out. Please try again.");
       setIsLoggingOut(false);
     }
   }

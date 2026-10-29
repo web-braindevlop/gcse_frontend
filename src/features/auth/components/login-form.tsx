@@ -4,15 +4,16 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeOffIcon } from "@/components/common";
 import { Button, Input } from "@/components/ui";
+import { useToast } from "@/components/feedback";
 import { AuthRequestError, getCurrentUser, login, type LoginAudience } from "../services/auth.service";
 
 type FieldErrors = { identifier?: string; password?: string };
 
 export function LoginForm({ audience = "student" }: { audience?: LoginAudience }) {
   const router = useRouter();
+  const toast = useToast();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [showPassword, setShowPassword] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -28,7 +29,6 @@ export function LoginForm({ audience = "student" }: { audience?: LoginAudience }
     if (!password) nextErrors.password = "Enter your password.";
 
     setErrors(nextErrors);
-    setNotice(null);
     if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
@@ -38,9 +38,10 @@ export function LoginForm({ audience = "student" }: { audience?: LoginAudience }
       if (verifiedUser.id !== signedInUser.id || verifiedUser.role !== signedInUser.role) {
         throw new AuthRequestError("Your sign-in could not be verified. Please try again.", 401);
       }
+      toast.success("Welcome back", audience === "staff" ? "You’re signed in to your staff workspace." : "You’re signed in to your learning space.");
       router.replace(audience === "staff" ? "/staff/dashboard" : "/dashboard/overview");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "We could not sign you in. Please try again.");
+      toast.error("Sign-in failed", error instanceof Error ? error.message : "We could not sign you in. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -78,12 +79,6 @@ export function LoginForm({ audience = "student" }: { audience?: LoginAudience }
           </button>
         }
       />
-
-      {notice && (
-        <p role="alert" className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-          {notice}
-        </p>
-      )}
 
       <Button type="submit" variant="brand" size="lg" className="w-full" loading={isSubmitting}>
         {isSubmitting ? "Signing in..." : "Log in"}
