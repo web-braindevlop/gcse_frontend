@@ -6,6 +6,21 @@ export type StudentRecord = {
   email: string;
   displayName: string;
   joinedAt: string;
+  hasLearningProfile: boolean;
+};
+
+export type StudentLearningProfileInput = {
+  level: "gcse" | "igcse_o_level" | "a_level";
+  subject: string;
+  examBoard: string;
+  schoolYear: string;
+  targetGrade: string;
+  tier: "foundation" | "higher" | "not_sure" | null;
+};
+
+export type StudentLearningProfile = StudentLearningProfileInput & {
+  studentId: string;
+  updatedAt: string;
 };
 
 export type StudentsPage = { items: StudentRecord[]; total: number; page: number; pageSize: number };
@@ -34,4 +49,34 @@ export async function getStudents(query: string, page: number): Promise<Students
     throw new StudentsRequestError(message ?? "We could not load the student directory.", response.status);
   }
   return body as StudentsPage;
+}
+
+async function requestStudentProfile<T>(studentId: string, method: "GET" | "PUT", input?: StudentLearningProfileInput) {
+  if (!API_BASE_URL) {
+    throw new StudentsRequestError("Student profiles are unavailable until the API is connected.", 503);
+  }
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/students/${encodeURIComponent(studentId)}/learning-profile`, {
+      method,
+      credentials: "include",
+      cache: "no-store",
+      ...(input ? { headers: { "Content-Type": "application/json" }, body: JSON.stringify(input) } : {}),
+    });
+  } catch {
+    throw new StudentsRequestError("We could not reach the student profile service. Please try again.", 0);
+  }
+  const body = await response.json().catch(() => null) as { profile?: T; error?: { message?: string } } | null;
+  if (!response.ok) {
+    throw new StudentsRequestError(body?.error?.message ?? "We could not update the student profile.", response.status);
+  }
+  return body as { profile: T };
+}
+
+export async function getStudentLearningProfile(studentId: string) {
+  return requestStudentProfile<StudentLearningProfile | null>(studentId, "GET");
+}
+
+export async function saveStudentLearningProfile(studentId: string, input: StudentLearningProfileInput) {
+  return requestStudentProfile<StudentLearningProfile>(studentId, "PUT", input);
 }
