@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { RefreshCw, User } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useToast } from "@/components/feedback";
 import { getCurrentUser, logout, type AuthUser } from "@/features/auth/services/auth.service";
@@ -12,6 +13,24 @@ export default function DashboardPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [message, setMessage] = useState("Loading your account...");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  function loadUser() {
+    getCurrentUser().then(({ user: current }) => {
+      if (current.role !== "student") {
+        router.replace("/staff/dashboard");
+        return;
+      }
+      setUser(current);
+      setMessage("");
+    }).catch((error: unknown) => {
+      if (typeof error === "object" && error !== null && "status" in error && error.status === 401) {
+        router.replace("/login/student");
+        return;
+      }
+      setMessage(error instanceof Error ? error.message : "We could not load your account.");
+    });
+  }
 
   useEffect(() => {
     let active = true;
@@ -34,6 +53,19 @@ export default function DashboardPage() {
     return () => { active = false; };
   }, [router]);
 
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    try {
+      const { user: current } = await getCurrentUser();
+      setUser(current);
+      toast.success("Refreshed", "Your dashboard has been refreshed.");
+    } catch {
+      toast.error("Refresh failed", "We could not refresh your dashboard. Please try again.");
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   async function handleLogout() {
     setIsLoggingOut(true);
     try {
@@ -48,6 +80,16 @@ export default function DashboardPage() {
 
   return (
     <main id="main-content" className="mx-auto flex min-h-[65vh] w-full max-w-5xl flex-col justify-center px-4 py-16 sm:px-6 lg:px-8">
+      {user && (
+        <div className="mb-6 flex items-center justify-between">
+          <Button variant="outline" onClick={() => router.push("/dashboard/profile")}>
+            <User aria-hidden="true" className="size-4" /> Profile
+          </Button>
+          <Button variant="outline" onClick={() => void handleRefresh()} loading={isRefreshing} aria-label="Refresh dashboard">
+            <RefreshCw aria-hidden="true" className="size-4" /> Refresh
+          </Button>
+        </div>
+      )}
       <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm sm:p-12">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-stone-600">Student dashboard</p>
         {user ? <>
