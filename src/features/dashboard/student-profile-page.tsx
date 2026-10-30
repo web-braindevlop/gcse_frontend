@@ -126,21 +126,19 @@ export default function StudentProfilePage({ audience }: { audience: "staff" | "
   const selectClasses = "min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-900 outline-none focus-visible:ring-2 focus-visible:ring-[#9292bf] disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-500";
 
   return (
-    <main className="mx-auto flex min-h-[65vh] w-full max-w-3xl flex-col px-4 py-10 sm:px-6 lg:px-8">
-      <button type="button" onClick={handleBack} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#62628c] hover:text-[#37375d] focus-visible:outline-2 focus-visible:outline-[#7777a6]">
-        <ArrowLeft aria-hidden="true" className="size-4" /> {audience === "staff" ? "Back to dashboard" : "Back to dashboard"}
-      </button>
+    <main className="min-h-screen bg-[#f7f7fc] px-4 py-7 text-[#102b42] sm:px-6">
+      <div className="mx-auto max-w-3xl">
+      <nav aria-label="Account setup progress" className="mb-7 overflow-x-auto pb-1"><ol className="flex min-w-[660px] items-center">{["Sign up","About you","Diagnostic","Your group","Learning map"].map((step,i)=><li key={step} className="flex flex-1 items-center last:flex-none"><span className={`grid size-7 shrink-0 place-items-center rounded-full text-xs font-bold ${i===1?"border-[3px] border-[#b8d8e8] bg-[#102b42] text-white":"bg-[#e6e6f8] text-[#102b42]"}`}>{i===0?"✓":i+1}</span><span className={`ml-2 whitespace-nowrap text-sm ${i===1?"font-semibold":""}`}>{step}</span>{i<4&&<span className="mx-2 h-px flex-1 bg-[#c9ccda]"/>}</li>)}</ol></nav>
+      <header className="mb-4"><h1 className="text-3xl font-semibold tracking-tight">Tell us about you, {audience === "student" ? "" : "your student"}</h1><p className="mt-1 text-sm text-[#596579]">We use this to pick the right diagnostic and the right group.</p></header>
 
-      <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-10">
+      <section className="rounded-3xl border border-[#dedfee] bg-white p-6 shadow-sm sm:p-7">
         <div className="flex items-center gap-3">
           <span className="grid size-11 place-items-center rounded-xl bg-[#e6e6f8] text-[#45456e]">
             <User aria-hidden="true" className="size-5" />
           </span>
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#62628c]">Learning profile</p>
-            <h1 className="text-2xl font-semibold tracking-tight text-stone-900">
-              {audience === "staff" ? "Student profile setup" : "Your learning profile"}
-            </h1>
+            <h2 className="text-xl font-semibold tracking-tight text-stone-900">{audience === "staff" ? "Student profile setup" : "About you"}</h2>
           </div>
         </div>
         <p className="mt-3 max-w-xl text-sm leading-6 text-stone-600">
@@ -241,7 +239,7 @@ export default function StudentProfilePage({ audience }: { audience: "staff" | "
             </div>
           </form>
         )}
-      </section>
+      </section></div>
     </main>
   );
 }
