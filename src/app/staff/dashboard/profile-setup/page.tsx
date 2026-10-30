@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import StudentProfilePage from "@/features/dashboard/student-profile-page";
+import { ProfileOptionsEditor } from "@/features/dashboard/components/profile-options-editor";
 
 export default function ProfileSetupPage() {
-  return <Suspense fallback={<main className="p-10 text-stone-600">Loading student profile…</main>}><StudentProfilePage audience="staff" /></Suspense>;
+  return <Suspense fallback={<main className="p-10 text-stone-600">Loading profile settings…</main>}><ProfileOptionsEditor /></Suspense>;
 }

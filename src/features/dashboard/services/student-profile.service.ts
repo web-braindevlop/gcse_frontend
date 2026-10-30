@@ -56,6 +56,10 @@ export async function getProfileOptions(): Promise<{ options: ProfileOptions }> 
   return request<{ options: ProfileOptions }>("/profile-options");
 }
 
+export async function saveProfileOptions(options: ProfileOptions): Promise<{ options: ProfileOptions }> {
+  return request<{ options: ProfileOptions }>("/profile-options", { method: "PUT", body: JSON.stringify(options) });
+}
+
 export async function getOwnProfile(): Promise<{ profile: StudentLearningProfile | null }> {
   return request<{ profile: StudentLearningProfile | null }>("/my-profile");
 }
